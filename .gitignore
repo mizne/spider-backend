@@ -1,0 +1,7 @@
+.DS_Store
+node_modules/
+dist/
+*/dist/
+npm-debug.log
+src/config/mongo.js
+puppeteer_dev_profile-*
