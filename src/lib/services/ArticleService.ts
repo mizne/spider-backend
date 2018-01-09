@@ -51,11 +51,11 @@ export class ArticleService {
     const existResults = await this.find({
       url: { $in: urls }
     })
-    this.logger.info(`exist news length: ${existResults.length}`)
+    this.logger.info(`exist articles length: ${existResults.length}`)
     const needInsertItems = items.filter(
       item => !existResults.find(exist => exist.url === item.url)
     )
-    this.logger.info(`need insert items length: ${needInsertItems.length}`)
+    this.logger.info(`need insert articles length: ${needInsertItems.length}`)
     const resp = await this.batchSave(needInsertItems)
     this.logger.success(`batch insert success`)
     return resp
