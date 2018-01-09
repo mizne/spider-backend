@@ -3,10 +3,9 @@ import * as cheerio from 'cheerio'
 
 import { Article } from '../../storage/models/Article'
 import { fullPath } from '../../utils'
-import { SourceCode } from '../seed/SeedsList'
 
 export class WanQingTextExtractStrategy implements TextExtractStrategy<Article> {
-  constructor(private host: string) {}
+  constructor(private host: string, private source: string) {}
   extract(html: string): Article[] {
     const $ = cheerio.load(html)
     const results: Article[] = []
@@ -18,7 +17,7 @@ export class WanQingTextExtractStrategy implements TextExtractStrategy<Article> 
         url: fullPath(this.host, a.attr('href')),
         title: a.text().trim(),
         summary: summaryDom.text(),
-        source: SourceCode.WAN_QING_YOU_CAO_XUAN
+        source: this.source
       })
     })
     return results

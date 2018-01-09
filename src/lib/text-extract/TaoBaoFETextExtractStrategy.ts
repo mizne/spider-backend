@@ -4,26 +4,22 @@ import * as cheerio from 'cheerio'
 import { Article } from '../../storage/models/Article'
 import { fullPath } from '../../utils'
 
-export class OscTextExtractStrategy implements TextExtractStrategy<Article> {
-  constructor(
-    private host: string,
-    private source: string
-  ) {}
+export class TaoBaoFETextExtractStrategy implements TextExtractStrategy<Article> {
+  constructor(private host: string, private source: string) {}
   extract(html: string): Article[] {
     const $ = cheerio.load(html)
     const results: Article[] = []
-    const nodeList = $('#kinds-of-news').find('.item')
+    const nodeList = $('.article.article-summary')
     nodeList.each((_, e) => {
-      const a = $(e).find('a')
-      const summaryDom = $(e).find('.summary')
+      const a = $(e).find('.article-title a')
+      const summaryDom = $(e).find('.article-excerpt')
       results.push({
         url: fullPath(this.host, a.attr('href')),
-        title: a.find('.text-ellipsis').text().trim(),
+        title: a.text().trim(),
         summary: summaryDom.text(),
         source: this.source
       })
     })
-    // 排除广告
-    return results.filter(e => e.title)
+    return results
   }
 }
