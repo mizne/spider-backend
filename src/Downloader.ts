@@ -4,28 +4,13 @@ import { Browser } from 'puppeteer'
 
 export class Downloader {
   private _url: string
-  private downloaderMode: DownloaderMode
   private logger: Logger
   private browser: Browser
   constructor() {
-    this.downloaderMode = DownloaderMode.DEFAULT
     this.logger = new Logger(Downloader.name)
   }
-  downloadHTML(): Promise<string> {
-    if (this.downloaderMode === DownloaderMode.DEFAULT) {
-      return this.puppeteerDownloadHTML()
-    }
-  }
-
-  set url(v: string) {
-    this._url = v
-  }
-
-  get url(): string {
-    return this._url
-  }
-
-  async puppeteerDownloadHTML(): Promise<string> {
+  async downloadHTML(): Promise<string> {
+    this.logger.start(`download html start; url: ${this._url}`)
     try {
       if (!this.browser) {
         this.browser = await puppeteer.launch({ headless: true })
@@ -38,13 +23,22 @@ export class Downloader {
         bodyHandle
       )
       await page.close()
+      this.logger.success(`download html success; url: ${this._url}`)
       return bodyHTML
     } catch (err) {
       this.logger.error(
-        `download html; url: ${this._url}; error: ${err.message}`
+        `download html error; url: ${this._url}; error: ${err.message}`
       )
       return ''
     }
+  }
+
+  set url(v: string) {
+    this._url = v
+  }
+
+  get url(): string {
+    return this._url
   }
 
   async destroy() {

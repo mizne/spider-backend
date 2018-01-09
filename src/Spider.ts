@@ -1,27 +1,22 @@
+import * as cheerio from 'cheerio'
 import { Downloader } from './Downloader'
-import { TextExtract } from './lib/text-extract/TextExtract'
-import { ISeeds } from './lib/seed//SeedsList'
-import { ArticleService } from './lib/services/ArticleService'
-import { Logger } from './utils/Logger'
 
-export class Spider {
-  private logger: Logger
+export abstract class Spider<T> {
   private downloader: Downloader
-  constructor() {
-    this.logger = new Logger(Spider.name)
+  constructor(public urls: string[], public selectors: any[]) {
     this.downloader = new Downloader()
   }
 
-  async run(seeds: ISeeds[]) {
-    for (const seed of seeds) {
-      this.downloader.url = `${seed.host}${seed.path}`
+  async run(): Promise<T[]> {
+    const results: T[] = []
+    for (let i = 0; i < this.urls.length; i += 1) {
+      this.downloader.url = `${this.urls[i]}`
       const html = await this.downloader.downloadHTML()
-      this.logger.success(`download html success; url: ${this.downloader.url}`)
-
-      const news = new TextExtract(seed.textExtractStrategy).extract(html)
-      await new ArticleService().batchInsertIfNotIn(news)
+      results.push(...this.parse(cheerio.load(html), this.urls[i], this.selectors[i]))
     }
-
-    await this.downloader.destroy()
+    this.downloader.destroy()
+    return results
   }
+
+  abstract parse($: CheerioStatic, url: string, selector: any): T[]
 }

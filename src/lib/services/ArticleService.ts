@@ -52,14 +52,12 @@ export class ArticleService {
       url: { $in: urls }
     })
     this.logger.info(`exist news length: ${existResults.length}`)
-
     const needInsertItems = items.filter(
       item => !existResults.find(exist => exist.url === item.url)
     )
-
     this.logger.info(`need insert items length: ${needInsertItems.length}`)
-
-    const resp = this.batchSave(needInsertItems)
+    const resp = await this.batchSave(needInsertItems)
+    this.logger.success(`batch insert success`)
     return resp
   }
 }
