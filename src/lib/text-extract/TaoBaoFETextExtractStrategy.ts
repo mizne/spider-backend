@@ -1,7 +1,7 @@
 import { TextExtractStrategy } from './TextExtractStrategy'
 import * as cheerio from 'cheerio'
 
-import { Article } from '../../storage/models/Article'
+import { Article } from '../models/Article'
 import { fullPath } from '../../utils'
 
 export class TaoBaoFETextExtractStrategy implements TextExtractStrategy<Article> {

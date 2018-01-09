@@ -1,4 +1,4 @@
-import { Article } from '../..//storage/models/Article'
+import { Article } from '../models/Article'
 import { TextExtractStrategy } from './TextExtractStrategy'
 
 export class TextExtract {

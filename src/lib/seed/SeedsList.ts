@@ -3,7 +3,7 @@ import { ToutiaoTextExtractStrategy } from '../text-extract/ToutiaoTextExtractSt
 import { TextExtractStrategy } from '../text-extract/TextExtractStrategy'
 import { WanQingTextExtractStrategy } from '../text-extract/WanQingTextExtractStrategy'
 import { TaoBaoFETextExtractStrategy } from '../text-extract/TaoBaoFETextExtractStrategy'
-import { Article } from '../../storage/models/Article'
+import { Article } from '../models/Article'
 
 export interface ISeeds {
   host: string

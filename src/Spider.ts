@@ -1,7 +1,7 @@
 import { Downloader } from './Downloader'
 import { TextExtract } from './lib/text-extract/TextExtract'
 import { ISeeds } from './lib/seed//SeedsList'
-import { ArticleService } from './storage/services/ArticleService'
+import { ArticleService } from './lib/services/ArticleService'
 import { Logger } from './utils/Logger'
 
 export class Spider {
