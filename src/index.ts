@@ -1,4 +1,4 @@
-import { TaskSpider } from './tasks/OscSpider'
+import { TaskSpider } from './tasks/TaskSpider'
 
 const urls = [
   'https://www.oschina.net/news/industry',

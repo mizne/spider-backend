@@ -23,7 +23,7 @@ const resolveHref = (url: string, href: string): string => {
     return href
   }
   
-  const host = url.split('\/').slice(0, 3)
+  const host = url.split('\/').slice(0, 3).join('')
   return `${host}${href.indexOf('/') === 0 ? '' : '/'}${href}`
 }
 
