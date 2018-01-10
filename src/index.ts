@@ -4,7 +4,8 @@ import { BlogSpider } from './custom/BlogSpider'
 
 const urls = [
   'https://jeffjade.com',
-  'http://taobaofed.org'
+  'http://taobaofed.org',
+  'https://www.h5jun.com/',
 ]
 const selectors = [
   {
@@ -24,7 +25,16 @@ const selectors = [
     source: '淘宝前端团队',
     moreUrl: 'a.page-number',
     releaseAt: 'time'
-  }
+  },
+  {
+    item: '#page-index .post',
+    title: '.title a',
+    url: '.title a',
+    summary: '.entry-content p',
+    source: '十年踪迹',
+    moreUrl: '.pagination a',
+    releaseAt: '.date'
+  },
 ]
 
 const task = new BlogSpider(urls, selectors)

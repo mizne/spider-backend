@@ -5,6 +5,7 @@
 
 [晚晴幽草轩](https://jeffjade.com)
 [淘宝前端团队](http://taobaofed.org)
+[十年踪迹](https://www.h5jun.com/)
 
 ### 未来会支持更多的网站资源爬取
 
