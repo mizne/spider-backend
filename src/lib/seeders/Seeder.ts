@@ -1,7 +1,7 @@
 import { Logger } from '../../utils/Logger'
 
 /**
- * 负责URL管理 TODO 去重处理
+ * 负责URL管理 TODO 优先级获取 同类网站获取分页 从小到大
  *
  * @export
  * @class Seeder

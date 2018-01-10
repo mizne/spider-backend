@@ -6,6 +6,7 @@ const urls = [
   'https://jeffjade.com',
   'http://taobaofed.org',
   'https://www.h5jun.com/',
+  'http://welefen.com/'
 ]
 const selectors = [
   {
@@ -32,6 +33,15 @@ const selectors = [
     url: '.title a',
     summary: '.entry-content p',
     source: '十年踪迹',
+    moreUrl: '.pagination a',
+    releaseAt: '.date'
+  },
+  {
+    item: '#page-index .post',
+    title: '.title a',
+    url: '.title a',
+    summary: '.entry-content p',
+    source: '李成银',
     moreUrl: '.pagination a',
     releaseAt: '.date'
   },
