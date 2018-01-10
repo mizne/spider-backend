@@ -1,21 +1,33 @@
 import * as cheerio from 'cheerio'
-import { Downloader } from './Downloader'
+import { Harvester } from './lib/harvesters/Harvester'
+import { Seeder } from './lib/seeders/Seeder'
 
 export abstract class Spider<T> {
-  private downloader: Downloader
+  private harvester: Harvester
   constructor(public urls: string[], public selectors: any[]) {
-    this.downloader = new Downloader()
+    this.harvester = new Harvester()
   }
 
-  async run(): Promise<T[]> {
-    const results: T[] = []
-    for (let i = 0; i < this.urls.length; i += 1) {
-      const html = await this.downloader.downloadHTML(this.urls[i])
-      results.push(...this.parse(cheerio.load(html), this.urls[i], this.selectors[i]))
+  async run(): Promise<any> {
+    // 生成 Seeder，从中获取url
+    const seeder = new Seeder(this.urls)
+    for (;;) {
+      if (seeder.isEmpty()) {
+        break
+      }
+      // Harvester通过url 去下载html
+      const { html, url } = await this.harvester.downloadHTML(seeder)
+      // parse 去解析html和搜集新url并添加给Seeder
+      const { items, urls } = this.parse(cheerio.load(html), url)
+      seeder.addMoreUrls(urls)
+
+      // save 解析完成的结果
+      this.save(items)
     }
-    this.downloader.destroy()
-    return results
+    this.harvester.destroy()
   }
 
-  abstract parse($: CheerioStatic, url: string, selector: any): T[]
+  abstract parse($: CheerioStatic, url: string): { items: T[]; urls: string[] }
+
+  abstract async save(items: T[]): Promise<any>
 }

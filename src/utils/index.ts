@@ -14,7 +14,9 @@ const fullPath = (host: string, path: string): string => {
 
 const resolveHref = (url: string, href: string): string => {
   if (!(url || isURL(url))) {
-    throw new Error(`url format not correctly; should be start with http or https; url: ${url}`)
+    throw new Error(
+      `url format not correctly; should be start with http or https; url: ${url}`
+    )
   }
   if (!href) {
     return ''
@@ -22,9 +24,26 @@ const resolveHref = (url: string, href: string): string => {
   if (isURL(href)) {
     return href
   }
-  
-  const [protocal, , host] = url.split('\/')
-  return `${protocal}//${host}${href.indexOf('/') === 0 ? '' : '/'}${href}`
+
+  const [protocal, , host] = url.split('/')
+  const hrefTotal = `${protocal}//${host}${
+    href.indexOf('/') === 0 ? '' : '/'
+  }${href}`
+  return hrefTotal.slice(-1) === '/' ? hrefTotal.slice(0, -1) : hrefTotal
 }
 
-export { resolveHref, fullPath }
+const extractRegularTime = (str: string) => {
+  const DATE_RE = /[\d]*(\d{4})[\D](\d{1,2})[\D](\d{1,2})[\D]*/
+  if (DATE_RE.test(str)) {
+    return str
+      .match(DATE_RE)[0]
+      .replace(/(\D+)/g, () => {
+        return '-'
+      })
+      .replace(/\D$/, () => '')
+  }
+
+  throw new Error(`date time format not support; str: ${str}`)
+}
+
+export { resolveHref, fullPath, extractRegularTime }

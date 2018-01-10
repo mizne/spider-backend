@@ -1,4 +1,4 @@
-import { Article } from '../models/Article'
+import { Blog } from '../models/Blog'
 import axios from 'axios'
 import { Logger } from '../../utils/Logger'
 
@@ -20,13 +20,13 @@ var http = axios.create({
   }
 })
 
-export class ArticleService {
+export class BlogService {
   private logger: Logger
   constructor() {
-    this.logger = new Logger(ArticleService.name)
+    this.logger = new Logger(BlogService.name)
   }
-  async find(where: any): Promise<Article[]> {
-    const resp = await http.get('classes/Article', {
+  async find(where: any): Promise<Blog[]> {
+    const resp = await http.get('classes/Blog', {
       params: {
         where
       }
@@ -34,11 +34,11 @@ export class ArticleService {
     return resp.data.results
   }
 
-  async batchSave(items: Article[]): Promise<any> {
+  async batchSave(items: Blog[]): Promise<any> {
     const params = {
       requests: items.map(e => ({
         method: 'POST',
-        path: '/1.1/classes/Article',
+        path: '/1.1/classes/Blog',
         body: e
       }))
     }
@@ -46,16 +46,16 @@ export class ArticleService {
     return resp.data
   }
 
-  async batchInsertIfNotIn(items: Article[]): Promise<any> {
+  async batchInsertIfNotIn(items: Blog[]): Promise<any> {
     const urls = items.map(e => e.url)
     const existResults = await this.find({
       url: { $in: urls }
     })
-    this.logger.info(`exist articles length: ${existResults.length}`)
+    this.logger.info(`exist blogs length: ${existResults.length}`)
     const needInsertItems = items.filter(
       item => !existResults.find(exist => exist.url === item.url)
     )
-    this.logger.info(`need insert articles length: ${needInsertItems.length}`)
+    this.logger.info(`need insert blogs length: ${needInsertItems.length}`)
     const resp = await this.batchSave(needInsertItems)
     this.logger.success(`batch insert success`)
     return resp

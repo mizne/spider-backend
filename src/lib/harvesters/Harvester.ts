@@ -1,14 +1,22 @@
 import * as puppeteer from 'puppeteer'
-import { Logger } from './utils/Logger'
 import { Browser } from 'puppeteer'
+import { Logger } from '../../utils/Logger'
+import { Seeder } from '../seeders/Seeder'
 
-export class Downloader {
+/**
+ * 负责下载 html TODO 任务失败处理
+ * 
+ * @export
+ * @class Harvester
+ */
+export class Harvester {
   private logger: Logger
   private browser: Browser
   constructor() {
-    this.logger = new Logger(Downloader.name)
+    this.logger = new Logger(Harvester.name)
   }
-  async downloadHTML(url: string): Promise<string> {
+  async downloadHTML(seeder: Seeder): Promise<{html: string, url: string}> {
+    const url = seeder.getUrl()
     this.logger.start(`download html start; url: ${url}`)
     try {
       if (!this.browser) {
@@ -22,13 +30,22 @@ export class Downloader {
         bodyHandle
       )
       await page.close()
-      this.logger.success(`download html success; url: ${url}`)
-      return bodyHTML
+      this.logger.success(`download html success; url: ${url};`)
+      seeder.success(url)
+      return {
+        html: bodyHTML,
+        url
+      }
     } catch (err) {
+      // TODO 下载失败待处理
       this.logger.error(
-        `download html error; url: ${url}; error: ${err.message}`
+        `download html error; url: ${url}; error: ${err.message};`
       )
-      return ''
+      seeder.failure(url)
+      return {
+        html: '',
+        url
+      }
     }
   }
 
