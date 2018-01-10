@@ -51,12 +51,14 @@ export class BlogSpider extends Spider<Blog> {
           .trim(),
         summary: $(e)
           .find(selector.summary)
-          .text(),
+          .text()
+          .trim(),
         source: selector.source,
         releaseAt: extractRegularTime(
           $(e)
             .find(selector.releaseAt)
             .text()
+            .trim()
         )
       })
     })

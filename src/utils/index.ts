@@ -39,14 +39,21 @@ const extractRegularTime = (str: string): string => {
   const DATE_RE1 = /[\D]*(\d{1,2})[\D](\d{1,2})[\D]+(\d{4})[\D]*/
   if (DATE_RE.test(str)) {
     const [year, month, day] = str.match(DATE_RE).slice(1, 4)
-    return `${year}-${month}-${day}`
+    return `${year}-${padZero(month)}-${padZero(day)}`
   }
   if (DATE_RE1.test(str)) {
     const [month, day, year] = str.match(DATE_RE1).slice(1, 4)
-    return `${year}-${month}-${day}`
+    return `${year}-${padZero(month)}-${padZero(day)}`
   }
 
   throw new Error(`date time format not support; str: ${str}`)
+}
+
+const padZero = (str: string, maxLength = 2): string => {
+  if (str.length > maxLength) {
+    throw new Error(`str: ${str} length too long than maxLength: ${maxLength};`)
+  }
+  return '0'.repeat(maxLength - str.length) + str
 }
 
 export { resolveHref, fullPath, extractRegularTime }

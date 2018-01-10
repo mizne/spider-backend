@@ -37,7 +37,6 @@ export class Harvester {
         url
       }
     } catch (err) {
-      // TODO 下载失败待处理
       this.logger.error(
         `download html error; url: ${url}; error: ${err.message};`
       )
@@ -56,6 +55,3 @@ export class Harvester {
   }
 }
 
-export enum DownloaderMode {
-  DEFAULT
-}
