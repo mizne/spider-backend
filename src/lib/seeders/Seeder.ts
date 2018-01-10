@@ -37,16 +37,9 @@ export class Seeder {
     this.logger.success(
       `url done success; url: ${url}; count: ${this.urlsDone.length}`
     )
-    if (new Set(this.urlsDone).size !== this.urlsDone.length) {
-      this.logger.error(`urls done has same url;`)
-    }
   }
 
   public failure(url: string): void {
     this.urlsToDo.push(url)
-  }
-
-  public getDoneUrls(): string[] {
-    return this.urlsDone
   }
 }
