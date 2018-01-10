@@ -10,8 +10,7 @@ export abstract class Spider<T> {
   async run(): Promise<T[]> {
     const results: T[] = []
     for (let i = 0; i < this.urls.length; i += 1) {
-      this.downloader.url = `${this.urls[i]}`
-      const html = await this.downloader.downloadHTML()
+      const html = await this.downloader.downloadHTML(this.urls[i])
       results.push(...this.parse(cheerio.load(html), this.urls[i], this.selectors[i]))
     }
     this.downloader.destroy()
