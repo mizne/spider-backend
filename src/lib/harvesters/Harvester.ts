@@ -4,7 +4,6 @@ import { SiteTask } from '../tasks/SiteTask'
 
 /**
  * 负责下载 html
- * TODO 任务失败处理 重试机制
  * TODO 如何处理 通过滚动到页底来加载更多内容
  * @export
  * @class Harvester
