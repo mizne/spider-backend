@@ -2,10 +2,10 @@ import { Logger } from '../../utils/Logger'
 import { SiteTask } from '../tasks/SiteTask'
 import { BlogSite } from '../models/Site'
 
-import { Subject } from 'rxjs'
+import { Subject, Subscription } from 'rxjs'
 
 /**
- * 负责URL管理 TODO 优先级获取 同类网站获取分页 从小到大
+ * 负责URL管理 TODO 优先级获取
  *
  * @export
  * @class Seeder
@@ -13,6 +13,7 @@ import { Subject } from 'rxjs'
 export class Seeder {
   private urlsTodo: { [key: string]: string[] } = {}
   private urlsDone: { [key: string]: string[] } = {}
+  private pendingTasks: SiteTask[] = []
   private logger: Logger
   private taskSuccessSub: Subject<SiteTask> = new Subject<SiteTask>()
   private taskFailureSub: Subject<SiteTask> = new Subject<SiteTask>()
@@ -21,8 +22,10 @@ export class Seeder {
     urls: string[]
   }> = new Subject<{ task: SiteTask; urls: string[] }>()
 
+  private subscriptions: Subscription[] = []
+
   constructor(private sites: BlogSite[]) {
-    this.logger = new Logger(Seeder.name)
+    this.initLogger()
     this.initUrls(sites)
     this.initSubscriber()
   }
@@ -36,7 +39,7 @@ export class Seeder {
       if (this.urlsTodo[domain].length > 0) {
         const url = this.urlsTodo[domain].shift()
         this.logger.info(`Get task success; domain: ${domain}; url: ${url};`)
-        return new SiteTask({
+        const task = new SiteTask({
           domain,
           url,
           selector: this.sites.find(e => e.url === domain).selector,
@@ -44,10 +47,26 @@ export class Seeder {
           failureSub: this.taskFailureSub,
           addMoreUrlsSub: this.taskAddMoreUrlsSub
         })
+        this.pendingTasks.push(task)
+        return task
       }
     }
 
     this.logger.error(`There is no task to get;`)
+  }
+
+  public destroy(): void {
+    this.urlsDone = null
+    this.urlsTodo = null
+    this.pendingTasks.length = 0
+    this.logger = null
+    this.subscriptions.forEach(e => {
+      e.unsubscribe()
+    })
+  }
+
+  private initLogger() {
+    this.logger = new Logger(Seeder.name)
   }
 
   private initUrls(sites: BlogSite[]) {
@@ -58,45 +77,64 @@ export class Seeder {
   }
 
   private initSubscriber() {
-    this.taskSuccessSub.asObservable().subscribe(task => {
+    const sub1 = this.taskSuccessSub.asObservable().subscribe(task => {
       this.success(task)
     })
-
-    this.taskFailureSub.asObservable().subscribe(task => {
+    const sub2 = this.taskFailureSub.asObservable().subscribe(task => {
       this.failure(task)
     })
-
-    this.taskAddMoreUrlsSub.asObservable().subscribe(({ task, urls }) => {
+    const sub3 = this.taskAddMoreUrlsSub.asObservable().subscribe(({ task, urls }) => {
       this.addMoreUrls(task, urls)
     })
+
+    this.subscriptions.push(sub1, sub2, sub3)
   }
 
   private success(task: SiteTask): void {
     const urlsDone = this.urlsDone[task.domain]
     urlsDone.push(task.url)
+    this.removePendingTask(task)
+
     this.logger.success(
-      `url done success; domain: ${task.domain}; url: ${task.url}; count: ${
-        urlsDone.length
-      }`
+      `url done success; domain: ${task.domain}; url: ${
+        task.url
+      }; count: ${this.computeDoneCount()}`
     )
   }
 
   private failure(task: SiteTask): void {
     const urlsTodo = this.urlsTodo[task.domain]
     urlsTodo.push(task.url)
+    this.removePendingTask(task)
+
     this.logger.warn(
-      `url done failure; domain: ${task.domain}; url: ${task.url}; count: ${
-        urlsTodo.length
-      }`
+      `url done failure; domain: ${task.domain}; url: ${
+        task.url
+      }; count: ${this.computeDoneCount()}`
     )
+  }
+
+  private removePendingTask(task: SiteTask) {
+    const index = this.pendingTasks.findIndex(e => e.equals(task))
+    this.pendingTasks.splice(index, 1)
+  }
+
+  private computeDoneCount(): number {
+    return Object.values(this.urlsDone).reduce((accu, curr) => {
+      return accu + curr.length
+    }, 0)
   }
 
   private addMoreUrls(task: SiteTask, urls: string[]): void {
     const urlsDone = this.urlsDone[task.domain]
     const urlsTodo = this.urlsTodo[task.domain]
-
-    const todoUrls = urls.filter(
-      e => urlsDone.indexOf(e) === -1 && urlsTodo.indexOf(e) === -1
+    const uniqueUrls = Array.from(new Set(urls))
+    // 不仅仅要排除掉 urlsDone和urlsTodo 还要排除掉 正在执行未结束的任务
+    const todoUrls = uniqueUrls.filter(
+      e =>
+        urlsDone.indexOf(e) === -1 &&
+        urlsTodo.indexOf(e) === -1 &&
+        this.pendingTasks.findIndex(f => f.url === e) === -1
     )
     urlsTodo.push(...todoUrls)
   }

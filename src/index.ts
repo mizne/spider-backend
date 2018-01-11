@@ -11,8 +11,8 @@ const sites: BlogSite[] = [
       summary: '.article-content p',
       source: '晚晴幽草轩',
       releaseAt: 'time',
-      moreUrl: 'a.page-number',
-    },
+      moreUrl: 'a.page-number'
+    }
   },
   {
     url: 'http://taobaofed.org',
@@ -23,8 +23,8 @@ const sites: BlogSite[] = [
       summary: '.article-excerpt',
       source: '淘宝前端团队',
       releaseAt: 'time',
-      moreUrl: 'a.page-number',
-    },
+      moreUrl: 'a.page-number'
+    }
   },
   {
     url: 'https://www.h5jun.com/',
@@ -35,8 +35,8 @@ const sites: BlogSite[] = [
       summary: '.entry-content p',
       source: '十年踪迹',
       releaseAt: '.date',
-      moreUrl: '.pagination a',
-    },
+      moreUrl: '.pagination a'
+    }
   },
   {
     url: 'http://welefen.com/',
@@ -47,8 +47,8 @@ const sites: BlogSite[] = [
       summary: '.entry-content p',
       source: '李成银',
       releaseAt: '.date',
-      moreUrl: '.pagination a',
-    },
+      moreUrl: '.pagination a'
+    }
   },
   {
     url: 'http://www.css88.com/',
@@ -59,10 +59,25 @@ const sites: BlogSite[] = [
       summary: '.entry-content p',
       source: 'WEB前端开发CSS88',
       releaseAt: 'time',
-      moreUrl: '.navigation a',
-    },
+      moreUrl: '.navigation a'
+    }
   }
 ]
 
-const task = new BlogSpider(sites)
-task.run()
+const spider = new BlogSpider(sites)
+
+const main = async (concurrent: number) => {
+  const startTime = Date.now()
+  await Promise.all(Array.from({ length: concurrent }, _ => spider.run()))
+  .then(() => {
+    spider.destroy()
+  })
+  const endTime = Date.now()
+  console.log(`COST TIME: ${Math.floor((endTime - startTime) / 1e3)} seconds;`)
+}
+
+try {
+  main(1)
+} catch(e) {
+  console.log(e)
+}

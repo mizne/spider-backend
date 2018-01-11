@@ -50,6 +50,10 @@ export class SiteTask {
     this.destroy()
   }
 
+  equals(anohter: SiteTask): boolean {
+    return this._id === anohter._id
+  }
+
   private destroy() {
     this._id = null
     this._domain = null
