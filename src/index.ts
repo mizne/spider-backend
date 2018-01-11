@@ -50,23 +50,23 @@ const sites: BlogSite[] = [
       moreUrl: '.pagination a'
     }
   },
-  {
-    url: 'http://www.css88.com/',
-    selector: {
-      item: 'article',
-      title: 'header h1 a',
-      url: 'header h1 a',
-      summary: '.entry-content p',
-      source: 'WEB前端开发CSS88',
-      releaseAt: 'time',
-      moreUrl: '.navigation a'
-    }
-  }
+  // {
+  //   url: 'http://www.css88.com/',
+  //   selector: {
+  //     item: 'article',
+  //     title: 'header h1 a',
+  //     url: 'header h1 a',
+  //     summary: '.entry-content p',
+  //     source: 'WEB前端开发CSS88',
+  //     releaseAt: 'time',
+  //     moreUrl: '.navigation a'
+  //   }
+  // }
 ]
 
 const spider = new BlogSpider(sites)
 
-const main = async (concurrent: number) => {
+const main = async (concurrent = sites.length) => {
   const startTime = Date.now()
   await Promise.all(Array.from({ length: concurrent }, _ => spider.run()))
   .then(() => {
@@ -77,7 +77,7 @@ const main = async (concurrent: number) => {
 }
 
 try {
-  main(8)
+  main()
 } catch(e) {
   console.log(e)
 }

@@ -4,6 +4,13 @@ import { BlogSelector } from '../models/Site'
 
 const MAX_RETRY_COUNT = 2
 
+export enum SiteTaskStatus {
+  PEDDING = 'PEDDING',
+  SUCCESS = 'SUCCESS',
+  TO_RETRY = 'TO_RETRY',
+  FAILURE = 'FAILURE'
+}
+
 export interface SiteTaskOptions {
   domain: string
   url: string
@@ -24,6 +31,8 @@ export class SiteTask {
   private _failureSub: Subject<SiteTask>
   private _addMoreUrlsSub: Subject<{ task: SiteTask; urls: string[] }>
   private _retryCount = 0
+  private _status = SiteTaskStatus.PEDDING
+
   constructor(options: SiteTaskOptions) {
     this._id = uuid.v4()
     this._domain = options.domain
@@ -37,12 +46,38 @@ export class SiteTask {
   }
 
   success() {
+    this._status = SiteTaskStatus.SUCCESS
     this._successSub.next(this)
   }
 
   failure() {
-    this._retryCount += 1
+    if (this._retryCount >= MAX_RETRY_COUNT) {
+      this._status = SiteTaskStatus.FAILURE
+    } else {
+      this._status = SiteTaskStatus.TO_RETRY
+    }
     this._failureSub.next(this)
+  }
+
+  retry() {
+    this._retryCount += 1
+    this._status = SiteTaskStatus.PEDDING
+  }
+
+  isCompleted(): boolean {
+    return this.isSuccess() || this.isFailure()
+  }
+
+  isSuccess(): boolean {
+    return this._status === SiteTaskStatus.SUCCESS
+  }
+
+  isFailure(): boolean {
+    return this._status === SiteTaskStatus.FAILURE
+  }
+
+  isPedding(): boolean {
+    return this._status === SiteTaskStatus.PEDDING
   }
 
   addMoreUrls(urls: string[]) {
@@ -50,30 +85,14 @@ export class SiteTask {
       task: this,
       urls
     })
-
-    this.destroy()
   }
 
   equals(anohter: SiteTask): boolean {
     return this._id === anohter._id
   }
 
-  canRetry(): boolean {
-    if (this._retryCount >= MAX_RETRY_COUNT) {
-      return false
-    }
-    return true
-  }
-
-  private destroy() {
-    this._id = null
-    this._domain = null
-    this._url = null
-    this._html = null
-    this._selector = null
-    this._successSub = null
-    this._failureSub = null
-    this._addMoreUrlsSub = null
+  needRetry(): boolean {
+    return this._status === SiteTaskStatus.TO_RETRY
   }
 
   get id(): string {
@@ -101,5 +120,9 @@ export class SiteTask {
 
   get retryCount(): number {
     return this._retryCount
+  }
+
+  get status(): SiteTaskStatus {
+    return this._status
   }
 }

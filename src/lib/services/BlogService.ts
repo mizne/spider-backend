@@ -51,13 +51,16 @@ export class BlogService {
     const existResults = await this.find({
       url: { $in: urls }
     })
-    this.logger.info(`exist blogs length: ${existResults.length}`)
     const needInsertItems = items.filter(
       item => !existResults.find(exist => exist.url === item.url)
     )
-    this.logger.info(`need insert blogs length: ${needInsertItems.length}`)
-    const resp = await this.batchSave(needInsertItems)
-    this.logger.success(`batch insert success`)
-    return resp
+    if (needInsertItems.length > 0) {
+      const resp = await this.batchSave(needInsertItems)
+      this.logger.success(
+        `Batch insert success; count: ${needInsertItems.length};`
+      )
+      return resp
+    }
+    return ''
   }
 }
