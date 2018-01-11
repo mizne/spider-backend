@@ -1,7 +1,7 @@
 import { Spider } from '../Spider'
 import { BlogService } from '../lib/services/BlogService'
 import { Blog } from '../lib/models/Blog'
-import { resolveHref, extractRegularTime } from '../utils/index'
+import { resolveHref, resolveTimeFormat } from '../utils/index'
 import { Logger } from '../utils/Logger'
 
 export class BlogSpider extends Spider<Blog> {
@@ -34,40 +34,68 @@ export class BlogSpider extends Spider<Blog> {
       }
     }
     const selector = this.selectors[urlIndex]
-    const results: Blog[] = []
-    const nodeList = $(selector.item)
-    nodeList.each((_, e) => {
-      results.push({
-        url: resolveHref(
-          url,
-          $(e)
-            .find(selector.url)
-            .attr('href')
-            .trim()
-        ),
-        title: $(e)
-          .find(selector.title)
-          .text()
-          .trim(),
-        summary: $(e)
-          .find(selector.summary)
-          .text()
-          .trim(),
-        source: selector.source,
-        releaseAt: extractRegularTime(
-          $(e)
-            .find(selector.releaseAt)
-            .text()
-            .trim()
-        )
-      })
-    })
+    // const results: Blog[] = []
+    // const nodeList = $(selector.item)
+    // nodeList.each((_, e) => {
+    //   results.push({
+    //     url: resolveHref(
+    //       url,
+    //       $(e)
+    //         .find(selector.url)
+    //         .attr('href')
+    //         .trim()
+    //     ),
+    //     title: $(e)
+    //       .find(selector.title)
+    //       .text()
+    //       .trim(),
+    //     summary: $(e)
+    //       .find(selector.summary)
+    //       .text()
+    //       .trim(),
+    //     source: selector.source,
+    //     releaseAt: resolveTimeFormat(
+    //       $(e)
+    //         .find(selector.releaseAt)
+    //         .text()
+    //         .trim()
+    //     )
+    //   })
+    // })
 
-    const moreUrls: string[] = []
-    const moreUrlList = $(selector.moreUrl)
-    moreUrlList.each((_, e) => {
-      moreUrls.push(resolveHref(url, $(e).attr('href')))
-    })
+    const results = Array.from($(selector.item)).map(e => ({
+      url: resolveHref(
+        url,
+        $(e)
+          .find(selector.url)
+          .attr('href')
+          .trim()
+      ),
+      title: $(e)
+        .find(selector.title)
+        .text()
+        .trim(),
+      summary: $(e)
+        .find(selector.summary)
+        .text()
+        .trim(),
+      source: selector.source,
+      releaseAt: resolveTimeFormat(
+        $(e)
+          .find(selector.releaseAt)
+          .text()
+          .trim()
+      )
+    }))
+
+    const moreUrls = Array.from($(selector.moreUrl)).map(e =>
+      resolveHref(url, $(e).attr('href'))
+    )
+    // const moreUrls: string[] = []
+    // const moreUrlList = $(selector.moreUrl)
+    // moreUrlList.each((_, e) => {
+    //   moreUrls.push(resolveHref(url, $(e).attr('href')))
+    // })
     return {
       items: results,
       urls: moreUrls

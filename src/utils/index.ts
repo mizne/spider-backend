@@ -32,7 +32,7 @@ const resolveHref = (url: string, href: string): string => {
   return hrefTotal.slice(-1) === '/' ? hrefTotal.slice(0, -1) : hrefTotal
 }
 
-const extractRegularTime = (str: string): string => {
+const resolveTimeFormat = (str: string): string => {
   // 支持日期格式 2017-12-11、2018/02/13、2018年1月4日
   const DATE_RE = /[\D]*(\d{4})[\D](\d{1,2})[\D](\d{1,2})[\D]*/
   // 支持日期格式 05月15, 2016
@@ -56,4 +56,4 @@ const padZero = (str: string, maxLength = 2): string => {
   return '0'.repeat(maxLength - str.length) + str
 }
 
-export { resolveHref, fullPath, extractRegularTime }
+export { resolveHref, fullPath, resolveTimeFormat }
