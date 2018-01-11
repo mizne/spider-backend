@@ -2,6 +2,8 @@ import { Subject } from 'rxjs'
 import * as uuid from 'uuid'
 import { BlogSelector } from '../models/Site'
 
+const MAX_RETRY_COUNT = 2
+
 export interface SiteTaskOptions {
   domain: string
   url: string
@@ -21,6 +23,7 @@ export class SiteTask {
   private _successSub: Subject<SiteTask>
   private _failureSub: Subject<SiteTask>
   private _addMoreUrlsSub: Subject<{ task: SiteTask; urls: string[] }>
+  private _retryCount = 0
   constructor(options: SiteTaskOptions) {
     this._id = uuid.v4()
     this._domain = options.domain
@@ -38,6 +41,7 @@ export class SiteTask {
   }
 
   failure() {
+    this._retryCount += 1
     this._failureSub.next(this)
   }
 
@@ -52,6 +56,13 @@ export class SiteTask {
 
   equals(anohter: SiteTask): boolean {
     return this._id === anohter._id
+  }
+
+  canRetry(): boolean {
+    if (this._retryCount >= MAX_RETRY_COUNT) {
+      return false
+    }
+    return true
   }
 
   private destroy() {
@@ -86,5 +97,9 @@ export class SiteTask {
 
   get selector(): BlogSelector {
     return this._selector
+  }
+
+  get retryCount(): number {
+    return this._retryCount
   }
 }

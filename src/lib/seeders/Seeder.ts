@@ -14,6 +14,7 @@ export class Seeder {
   private urlsTodo: { [key: string]: string[] } = {}
   private urlsDone: { [key: string]: string[] } = {}
   private pendingTasks: SiteTask[] = []
+  private retryTasks: SiteTask[] = []
   private logger: Logger
   private taskSuccessSub: Subject<SiteTask> = new Subject<SiteTask>()
   private taskFailureSub: Subject<SiteTask> = new Subject<SiteTask>()
@@ -31,7 +32,10 @@ export class Seeder {
   }
 
   public isEmpty(): boolean {
-    return Object.values(this.urlsTodo).every(arr => arr.length === 0)
+    return (
+      Object.values(this.urlsTodo).every(arr => arr.length === 0) && 
+      this.retryTasks.filter(e => e.canRetry()).length === 0
+    )
   }
 
   public getTask(): SiteTask {
@@ -52,6 +56,27 @@ export class Seeder {
       }
     }
 
+    if (this.retryTasks.length > 0) {
+      for (let i = 0; i < this.retryTasks.length; i += 1) {
+        let task = this.retryTasks[i]
+        if (task.canRetry()) {
+          this.retryTasks.splice(i, 1)
+          this.logger.info(
+            `Task retry; count: ${task.retryCount}; url: ${task.url};`
+          )
+          return task
+        } else {
+          this.retryTasks.splice(i, 1)
+          i -= 1
+          this.logger.error(
+            `Task discard because of retry count max: ${
+              task.retryCount
+            }; url: ${task.url}`
+          )
+        }
+      }
+    }
+
     this.logger.error(`There is no task to get;`)
   }
 
@@ -59,6 +84,7 @@ export class Seeder {
     this.urlsDone = null
     this.urlsTodo = null
     this.pendingTasks.length = 0
+    this.retryTasks.length = 0
     this.logger = null
     this.subscriptions.forEach(e => {
       e.unsubscribe()
@@ -83,9 +109,11 @@ export class Seeder {
     const sub2 = this.taskFailureSub.asObservable().subscribe(task => {
       this.failure(task)
     })
-    const sub3 = this.taskAddMoreUrlsSub.asObservable().subscribe(({ task, urls }) => {
-      this.addMoreUrls(task, urls)
-    })
+    const sub3 = this.taskAddMoreUrlsSub
+      .asObservable()
+      .subscribe(({ task, urls }) => {
+        this.addMoreUrls(task, urls)
+      })
 
     this.subscriptions.push(sub1, sub2, sub3)
   }
@@ -96,21 +124,20 @@ export class Seeder {
     this.removePendingTask(task)
 
     this.logger.success(
-      `url done success; domain: ${task.domain}; url: ${
+      `task success; domain: ${task.domain}; url: ${
         task.url
-      }; count: ${this.computeDoneCount()}`
+      }; success count: ${this.computeDoneCount()}`
     )
   }
 
   private failure(task: SiteTask): void {
-    const urlsTodo = this.urlsTodo[task.domain]
-    urlsTodo.push(task.url)
     this.removePendingTask(task)
+    this.retryTasks.push(task)
 
     this.logger.warn(
-      `url done failure; domain: ${task.domain}; url: ${
-        task.url
-      }; count: ${this.computeDoneCount()}`
+      `task failure; domain: ${task.domain}; url: ${task.url}; retry count: ${
+        task.retryCount
+      }`
     )
   }
 

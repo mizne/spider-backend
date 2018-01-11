@@ -77,7 +77,7 @@ const main = async (concurrent: number) => {
 }
 
 try {
-  main(1)
+  main(8)
 } catch(e) {
   console.log(e)
 }
