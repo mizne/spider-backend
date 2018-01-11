@@ -1,39 +1,28 @@
 import { Spider } from '../Spider'
 import { BlogService } from '../lib/services/BlogService'
 import { Blog } from '../lib/models/Blog'
+import { BlogSite } from '../lib/models/site.model'
 import { resolveHref, resolveTimeFormat } from '../utils/index'
 import { Logger } from '../utils/Logger'
+import { SiteTask } from '../lib/tasks/SiteTask'
 
 export class BlogSpider extends Spider<Blog> {
   private blogService: BlogService
   private logger: Logger
-  constructor(urls: string[], selectors: any[]) {
-    super(urls, selectors)
+  constructor(sites: BlogSite[]) {
+    super(sites)
     this.blogService = new BlogService()
     this.logger = new Logger(BlogSpider.name)
   }
 
   parse(
     $: CheerioStatic,
-    url: string
+    task: SiteTask
   ): {
-    items: Blog[]
+    items: Blog[],
     urls: string[]
   } {
-    const urlIndex = this.urls
-      .map(url => {
-        const [protocol, , host] = url.split(/\//)
-        return `${protocol}//${host}`
-      })
-      .findIndex(e => url.startsWith(e))
-    if (urlIndex === -1) {
-      this.logger.warn(`blog url: ${url} is external site;`)
-      return {
-        items: [],
-        urls: []
-      }
-    }
-    const selector = this.selectors[urlIndex]
+    const { url, selector } = task
 
     const results = Array.from($(selector.item)).map(e => ({
       url: resolveHref(
