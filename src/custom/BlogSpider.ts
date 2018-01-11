@@ -34,34 +34,6 @@ export class BlogSpider extends Spider<Blog> {
       }
     }
     const selector = this.selectors[urlIndex]
-    // const results: Blog[] = []
-    // const nodeList = $(selector.item)
-    // nodeList.each((_, e) => {
-    //   results.push({
-    //     url: resolveHref(
-    //       url,
-    //       $(e)
-    //         .find(selector.url)
-    //         .attr('href')
-    //         .trim()
-    //     ),
-    //     title: $(e)
-    //       .find(selector.title)
-    //       .text()
-    //       .trim(),
-    //     summary: $(e)
-    //       .find(selector.summary)
-    //       .text()
-    //       .trim(),
-    //     source: selector.source,
-    //     releaseAt: resolveTimeFormat(
-    //       $(e)
-    //         .find(selector.releaseAt)
-    //         .text()
-    //         .trim()
-    //     )
-    //   })
-    // })
 
     const results = Array.from($(selector.item)).map(e => ({
       url: resolveHref(
@@ -91,11 +63,7 @@ export class BlogSpider extends Spider<Blog> {
     const moreUrls = Array.from($(selector.moreUrl)).map(e =>
       resolveHref(url, $(e).attr('href'))
     )
-    // const moreUrls: string[] = []
-    // const moreUrlList = $(selector.moreUrl)
-    // moreUrlList.each((_, e) => {
-    //   moreUrls.push(resolveHref(url, $(e).attr('href')))
-    // })
+
     return {
       items: results,
       urls: moreUrls
