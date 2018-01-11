@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import { Harvester } from './lib/harvesters/Harvester'
 import { Seeder } from './lib/seeders/Seeder'
-import { BlogSite } from './lib/models/site.model'
+import { BlogSite } from './lib/models/Site'
 import { SiteTask } from './lib/tasks/SiteTask'
 import { Logger } from './utils/Logger'
 

@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs'
 import * as uuid from 'uuid'
-import { BlogSelector } from '../models/site.model'
+import { BlogSelector } from '../models/Site'
 
 export interface SiteTaskOptions {
   domain: string

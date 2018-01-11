@@ -1,18 +1,15 @@
 import { Spider } from '../Spider'
 import { BlogService } from '../lib/services/BlogService'
 import { Blog } from '../lib/models/Blog'
-import { BlogSite } from '../lib/models/site.model'
+import { BlogSite } from '../lib/models/Site'
 import { resolveHref, resolveTimeFormat } from '../utils/index'
-import { Logger } from '../utils/Logger'
 import { SiteTask } from '../lib/tasks/SiteTask'
 
 export class BlogSpider extends Spider<Blog> {
   private blogService: BlogService
-  private logger: Logger
   constructor(sites: BlogSite[]) {
     super(sites)
     this.blogService = new BlogService()
-    this.logger = new Logger(BlogSpider.name)
   }
 
   parse(

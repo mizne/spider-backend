@@ -1,6 +1,6 @@
 import { Logger } from '../../utils/Logger'
 import { SiteTask } from '../tasks/SiteTask'
-import { BlogSite } from '../models/site.model'
+import { BlogSite } from '../models/Site'
 
 import { Subject } from 'rxjs'
 

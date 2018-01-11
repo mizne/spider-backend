@@ -1,5 +1,5 @@
 import { BlogSpider } from './custom/BlogSpider'
-import { BlogSite } from './lib/models/site.model'
+import { BlogSite } from './lib/models/Site'
 
 const sites: BlogSite[] = [
   {
