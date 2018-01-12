@@ -1,7 +1,7 @@
 import * as koa from 'koa'
 import * as Router from 'koa-router'
 
-// import { main } from './index'
+import { main } from './index'
 import { debugError } from './lib/Helper'
 
 const app = new koa()

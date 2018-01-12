@@ -25,42 +25,42 @@ const sites: BlogSite[] = [
       moreUrl: 'a.page-number'
     }
   },
-  // {
-  //   url: 'https://www.h5jun.com/',
-  //   selector: {
-  //     item: '#page-index .post',
-  //     title: '.title a',
-  //     url: '.title a',
-  //     summary: '.entry-content p',
-  //     source: '十年踪迹',
-  //     releaseAt: '.date',
-  //     moreUrl: '.pagination a'
-  //   }
-  // },
-  // {
-  //   url: 'http://welefen.com/',
-  //   selector: {
-  //     item: '#page-index .post',
-  //     title: '.title a',
-  //     url: '.title a',
-  //     summary: '.entry-content p',
-  //     source: '李成银',
-  //     releaseAt: '.date',
-  //     moreUrl: '.pagination a'
-  //   }
-  // },
-  // {
-  //   url: 'http://www.css88.com/',
-  //   selector: {
-  //     item: 'article',
-  //     title: 'header h1 a',
-  //     url: 'header h1 a',
-  //     summary: '.entry-content p',
-  //     source: 'WEB前端开发CSS88',
-  //     releaseAt: 'time',
-  //     moreUrl: '.navigation a'
-  //   }
-  // }
+  {
+    url: 'https://www.h5jun.com/',
+    selector: {
+      item: '#page-index .post',
+      title: '.title a',
+      url: '.title a',
+      summary: '.entry-content p',
+      source: '十年踪迹',
+      releaseAt: '.date',
+      moreUrl: '.pagination a'
+    }
+  },
+  {
+    url: 'http://welefen.com/',
+    selector: {
+      item: '#page-index .post',
+      title: '.title a',
+      url: '.title a',
+      summary: '.entry-content p',
+      source: '李成银',
+      releaseAt: '.date',
+      moreUrl: '.pagination a'
+    }
+  },
+  {
+    url: 'http://www.css88.com/',
+    selector: {
+      item: 'article',
+      title: 'header h1 a',
+      url: 'header h1 a',
+      summary: '.entry-content p',
+      source: 'WEB前端开发CSS88',
+      releaseAt: 'time',
+      moreUrl: '.navigation a'
+    }
+  }
 ]
 
 export { sites }
