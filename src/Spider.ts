@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio'
 import * as debug from 'debug'
 import { Harvester } from './lib/harvesters/Harvester'
 import { Seeder } from './lib/seeders/Seeder'
-import { BlogSite } from './lib/models/Site'
+import { BlogSite, BlogSelector } from './lib/models/Site'
 import { SiteTask } from './lib/tasks/SiteTask'
 import { debugError } from './lib/Helper'
 const debugSpider = debug('Spider:Spider.ts')
@@ -15,7 +15,7 @@ export abstract class Spider<T> {
     this.harvester = new Harvester()
   }
 
-  public async run(): Promise<any> {
+  public async singleRun(): Promise<any> {
     try {
       for (;;) {
         if (this.seeder.complete()) {
@@ -24,12 +24,16 @@ export abstract class Spider<T> {
         const task = this.seeder.getTask()
         if (task) {
           // Harvester通过url 去下载html
-          await this.harvester.execute(task)
+          task.html = await this.harvester.execute(task.url)
           // parse 去解析html和搜集新url
-          const { items, urls } = this.parse(cheerio.load(task.html), task)
+          const { items, urls } = this.parse(
+            cheerio.load(task.html),
+            task.url,
+            task.selector
+          )
           task.addMoreUrls(urls)
           // save 解析完成的结果
-          await this.save(items)
+          task.insertItemCount = await this.save(items)
         } else {
           // 此时 没有可重试任务 和 待生成任务的url
           // 只剩下 peddingTasks
@@ -43,7 +47,20 @@ export abstract class Spider<T> {
     }
   }
 
-  public destroy() {
+  public async run(concurrent: number = this.sites.length): Promise<any> {
+    return Promise.all(Array.from({length: concurrent}, () => this.singleRun()))
+    .then(() => {
+      const totalInsertItemCount = this.seeder.getTotalInsertItemCount()
+      this.doDestroy()
+      return totalInsertItemCount
+    })
+    .catch((err) => {
+      this.doDestroy()
+      return Promise.reject(err)
+    })
+  }
+
+  private doDestroy(): void {
     this.seeder.destroy()
     this.seeder = null
     this.harvester.destroy()
@@ -52,10 +69,11 @@ export abstract class Spider<T> {
 
   public abstract parse(
     $: CheerioStatic,
-    task: SiteTask
+    url: string,
+    selector: BlogSelector
   ): { items: T[]; urls: string[] }
 
-  public abstract async save(items: T[]): Promise<any>
+  public abstract async save(items: T[]): Promise<number>
 }
 
 function sleep(ms: number) {

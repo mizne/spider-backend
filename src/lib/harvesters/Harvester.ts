@@ -1,6 +1,8 @@
 import * as puppeteer from 'puppeteer'
 import { Browser } from 'puppeteer'
-import { SiteTask } from '../tasks/SiteTask'
+import * as debug from 'debug'
+
+const debugHarvester = debug('Spider:Harvester')
 
 /**
  * 负责下载 html
@@ -12,15 +14,17 @@ export class Harvester {
   private browser: Browser
   constructor() {
   }
-  public async execute(task: SiteTask): Promise<any> {
+  public async execute(url: string): Promise<string> {
     try {
-      task.html = await this.downloadHtml(task.url)
+      return await this.downloadHtml(url)
     } catch (err) {
-      task.html = ''
+      debugHarvester(`Download html failure; url: ${url}; err: ${err.message};`)
+      return ''
     }
   }
 
   public async downloadHtml(url: string): Promise<string> {
+    debugHarvester(`Download html beginning; url: ${url};`)
     if (!this.browser) {
       this.browser = await puppeteer.launch({ headless: true })
     }
@@ -32,6 +36,7 @@ export class Harvester {
       bodyHandle
     )
     await page.close()
+    debugHarvester(`Download html success; url: ${url};`)
     return bodyHTML
   }
 

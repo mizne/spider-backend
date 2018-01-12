@@ -2,7 +2,7 @@ import { Subject } from 'rxjs'
 import * as uuid from 'uuid'
 import { BlogSelector } from '../models/Site'
 
-const MAX_RETRY_COUNT = 5
+const MAX_RETRY_COUNT = 3
 
 export enum SiteTaskStatus {
   PEDDING = 'PEDDING',
@@ -32,6 +32,7 @@ export class SiteTask {
   private _addMoreUrlsSub: Subject<{ task: SiteTask; urls: string[] }>
   private _retryCount = 0
   private _status = SiteTaskStatus.PEDDING
+  private _insertItemCount = 0
 
   constructor(options: SiteTaskOptions) {
     this._id = uuid.v4()
@@ -101,8 +102,8 @@ export class SiteTask {
       url: this._url,
       domain: this._domain,
       retryCount: this._retryCount,
-      html: this._html,
-      status: this._status
+      status: this._status,
+      insertItemCount: this._insertItemCount
     }
   }
 
@@ -144,5 +145,13 @@ export class SiteTask {
 
   get status(): SiteTaskStatus {
     return this._status
+  }
+
+  set insertItemCount(v: number) {
+    this._insertItemCount = v
+  }
+
+  get insertItemCount(): number {
+    return this._insertItemCount
   }
 }

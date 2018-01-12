@@ -13,8 +13,8 @@ const seederDebug = debug('Spider:Seeder.ts')
  * @class Seeder
  */
 export class Seeder {
-  private urlsTodo: { [key: string]: string[] } = {}
-  private tasks: SiteTask[] = []
+  private _urlsTodo: { [key: string]: string[] } = {}
+  private _tasks: SiteTask[] = []
 
   private taskSuccessSub: Subject<SiteTask> = new Subject<SiteTask>()
   private taskFailureSub: Subject<SiteTask> = new Subject<SiteTask>()
@@ -32,15 +32,15 @@ export class Seeder {
 
   public complete(): boolean {
     return (
-      Object.values(this.urlsTodo).every(arr => arr.length === 0) &&
-      this.tasks.every(e => e.isCompleted())
+      Object.values(this._urlsTodo).every(arr => arr.length === 0) &&
+      this._tasks.every(e => e.isCompleted())
     )
   }
 
   public getTask(): SiteTask {
-    for (const domain of Object.keys(this.urlsTodo)) {
-      if (this.urlsTodo[domain].length > 0) {
-        const url = this.urlsTodo[domain].shift()
+    for (const domain of Object.keys(this._urlsTodo)) {
+      if (this._urlsTodo[domain].length > 0) {
+        const url = this._urlsTodo[domain].shift()
         seederDebug(`Get task success; domain: ${domain}; url: ${url};`)
         const task = new SiteTask({
           domain,
@@ -50,12 +50,12 @@ export class Seeder {
           failureSub: this.taskFailureSub,
           addMoreUrlsSub: this.taskAddMoreUrlsSub
         })
-        this.tasks.push(task)
+        this._tasks.push(task)
         return task
       }
     }
 
-    for (const task of this.tasks) {
+    for (const task of this._tasks) {
       if (task.needRetry()) {
         task.retry()
         seederDebug(
@@ -71,17 +71,23 @@ export class Seeder {
   }
 
   public destroy(): void {
-    this.urlsTodo = null
-    this.tasks.length = 0
+    this._urlsTodo = null
+    this._tasks.length = 0
     this.subscriptions.forEach(e => {
       e.unsubscribe()
     })
   }
 
+  public getTotalInsertItemCount(): number {
+    return this._tasks.reduce((accu, curr) => {
+      return accu + curr.insertItemCount
+    }, 0)
+  }
+
   private toJSON() {
     return {
-      tasks: this.tasks,
-      urlsTodo: this.urlsTodo
+      tasks: this._tasks,
+      urlsTodo: this._urlsTodo
     }
   }
 
@@ -89,9 +95,13 @@ export class Seeder {
     return this.toJSON()
   }
 
+  get tasks(): SiteTask[] {
+    return this._tasks
+  }
+
   private initUrls(sites: BlogSite[]) {
     sites.forEach(site => {
-      this.urlsTodo[site.url] = [site.url]
+      this._urlsTodo[site.url] = [site.url]
     })
   }
 
@@ -138,17 +148,17 @@ export class Seeder {
   }
 
   private computeDoneCount(): number {
-    return this.tasks.filter(e => e.isSuccess()).length
+    return this._tasks.filter(e => e.isSuccess()).length
   }
 
   private addMoreUrls(task: SiteTask, urls: string[]): void {
-    const urlsTodo = this.urlsTodo[task.domain]
+    const urlsTodo = this._urlsTodo[task.domain]
 
     const uniqueUrls = Array.from(new Set(urls))
     const todoUrls = uniqueUrls.filter(
       e =>
         urlsTodo.indexOf(e) === -1 &&
-        this.tasks.findIndex(f => f.url === e) === -1
+        this._tasks.findIndex(f => f.url === e) === -1
     )
     urlsTodo.push(...todoUrls)
 
@@ -157,8 +167,8 @@ export class Seeder {
 
   private assertUniqueUrls() {
     const allUrls = []
-      .concat(...Object.values(this.urlsTodo))
-      .concat(this.tasks.map(e => e.url))
+      .concat(...Object.values(this._urlsTodo))
+      .concat(this._tasks.map(e => e.url))
     const allMustBeUnique = new Set(allUrls).size === allUrls.length
     assert(
       allMustBeUnique,
@@ -167,7 +177,7 @@ export class Seeder {
   }
 
   private assertTasksStatus() {
-    const allNotNeddRetry = this.tasks.every(e => !e.needRetry())
+    const allNotNeddRetry = this._tasks.every(e => !e.needRetry())
     assert(allNotNeddRetry, 'Tasks has someone to need retry!')
   }
 }

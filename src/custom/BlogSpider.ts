@@ -1,7 +1,7 @@
 import { Spider } from '../Spider'
 import { BlogService } from '../lib/services/BlogService'
 import { Blog } from '../lib/models/Blog'
-import { BlogSite } from '../lib/models/Site'
+import { BlogSite, BlogSelector } from '../lib/models/Site'
 import { Helper } from '../lib/Helper'
 import { SiteTask } from '../lib/tasks/SiteTask'
 
@@ -14,12 +14,12 @@ export class BlogSpider extends Spider<Blog> {
 
   public parse(
     $: CheerioStatic,
-    task: SiteTask
+    url: string,
+    selector: BlogSelector
   ): {
     items: Blog[],
     urls: string[]
   } {
-    const { url, selector } = task
 
     const results = Array.from($(selector.item)).map(e => ({
       url: Helper.resolveHref(
@@ -56,7 +56,7 @@ export class BlogSpider extends Spider<Blog> {
     }
   }
 
-  public async save(blogs: Blog[]) {
+  public async save(blogs: Blog[]): Promise<number> {
     return this.blogService.batchInsertIfNotIn(blogs)
   }
 }

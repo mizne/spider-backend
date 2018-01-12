@@ -1,6 +1,7 @@
-import { Blog } from '../models/Blog'
 import axios from 'axios'
 import * as debug from 'debug'
+import { debugError } from '../Helper'
+import { Blog } from '../models/Blog'
 const serviceDebug = debug('Spider:BlogService.ts')
 
 var APP_ID = 'n2WB91RtFeJWLLDJA6KPdXSe-gzGzoHsz'
@@ -21,8 +22,7 @@ var http = axios.create({
 })
 
 export class BlogService {
-  constructor() {
-  }
+  constructor() {}
   public async find(where: any): Promise<Blog[]> {
     const resp = await http.get('classes/Blog', {
       params: {
@@ -44,21 +44,23 @@ export class BlogService {
     return resp.data
   }
 
-  public async batchInsertIfNotIn(items: Blog[]): Promise<any> {
-    const urls = items.map(e => e.url)
-    const existResults = await this.find({
-      url: { $in: urls }
-    })
-    const needInsertItems = items.filter(
-      item => !existResults.find(exist => exist.url === item.url)
-    )
-    if (needInsertItems.length > 0) {
-      const resp = await this.batchSave(needInsertItems)
-      serviceDebug(
-        `Batch insert success; count: ${needInsertItems.length};`
+  public async batchInsertIfNotIn(items: Blog[]): Promise<number> {
+    try {
+      const urls = items.map(e => e.url)
+      const existResults = await this.find({
+        url: { $in: urls }
+      })
+      const needInsertItems = items.filter(
+        item => !existResults.find(exist => exist.url === item.url)
       )
-      return resp
+      if (needInsertItems.length > 0) {
+        await this.batchSave(needInsertItems)
+        serviceDebug(`Batch insert success; count: ${needInsertItems.length};`)
+        return needInsertItems.length
+      }
+    } catch (e) {
+      serviceDebug(`Batch insert failure; err: ${e};`)
     }
-    return ''
+    return 0
   }
 }
