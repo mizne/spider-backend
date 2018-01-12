@@ -66,11 +66,8 @@ export class Seeder {
       }
     }
 
-    console.log(
-      `there is all pending tasks; length: ${
-        this.tasks.filter(e => e.isPedding()).length
-      };`
-    )
+    this.assertTasksStatus()
+
     return null
   }
 
@@ -81,6 +78,17 @@ export class Seeder {
     this.subscriptions.forEach(e => {
       e.unsubscribe()
     })
+  }
+
+  private toJSON() {
+    return {
+      tasks: this.tasks,
+      urlsTodo: this.urlsTodo
+    }
+  }
+
+  public inspect() {
+    return this.toJSON()
   }
 
   private initLogger() {
@@ -149,5 +157,23 @@ export class Seeder {
         this.tasks.findIndex(f => f.url === e) === -1
     )
     urlsTodo.push(...todoUrls)
+
+    this.assertUniqueUrls()
+  }
+
+  private assertUniqueUrls() {
+    const allUrls = []
+      .concat(...Object.values(this.urlsTodo))
+      .concat(this.tasks.map(e => e.url))
+    const allMustBeUnique = new Set(allUrls).size === allUrls.length
+    console.assert(
+      allMustBeUnique,
+      `Urls with todoUrl and tasks must be unique when add more urls;`
+    )
+  }
+
+  private assertTasksStatus() {
+    const allNotNeddRetry = this.tasks.every(e => !e.needRetry())
+    console.assert(allNotNeddRetry, 'Tasks must be all not need retry!!!')
   }
 }

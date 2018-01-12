@@ -2,7 +2,7 @@ import { Subject } from 'rxjs'
 import * as uuid from 'uuid'
 import { BlogSelector } from '../models/Site'
 
-const MAX_RETRY_COUNT = 2
+const MAX_RETRY_COUNT = 5
 
 export enum SiteTaskStatus {
   PEDDING = 'PEDDING',
@@ -95,6 +95,21 @@ export class SiteTask {
     return this._status === SiteTaskStatus.TO_RETRY
   }
 
+  private toJSON() {
+    return {
+      id: this._id,
+      url: this._url,
+      domain: this._domain,
+      retryCount: this._retryCount,
+      html: this._html,
+      status: this._status
+    }
+  }
+
+  public inspect() {
+    return this.toJSON()
+  }
+
   get id(): string {
     return this._id
   }
@@ -112,6 +127,11 @@ export class SiteTask {
 
   set html(v: string) {
     this._html = v
+    if (v) {
+      this.success()
+    } else {
+      this.failure()
+    }
   }
 
   get selector(): BlogSelector {

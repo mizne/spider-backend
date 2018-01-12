@@ -76,8 +76,4 @@ const main = async (concurrent = sites.length) => {
   console.log(`COST TIME: ${Math.floor((endTime - startTime) / 1e3)} seconds;`)
 }
 
-try {
-  main()
-} catch(e) {
-  console.log(e)
-}
+main()

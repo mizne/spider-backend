@@ -15,10 +15,8 @@ export class Harvester {
   async execute(task: SiteTask): Promise<any> {
     try {
       task.html = await this.downloadHtml(task.url)
-      task.success()
     } catch (err) {
       task.html = ''
-      task.failure()
     }
   }
 
