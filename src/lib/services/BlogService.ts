@@ -50,6 +50,10 @@ export class BlogService {
       const existResults = await this.find({
         url: { $in: urls }
       })
+      .catch((e) => {
+        serviceDebug(`Batch find item failure; err: ${e.message};`)
+        return [] as Blog[]
+      })
       const needInsertItems = items.filter(
         item => !existResults.find(exist => exist.url === item.url)
       )

@@ -2,6 +2,7 @@ import { Subject, Subscription } from 'rxjs'
 import * as assert from 'assert'
 import { SiteTask } from '../tasks/SiteTask'
 import { BlogSite } from '../models/Site'
+import { TaskStatistics } from '../models/Statistics'
 
 import * as debug from 'debug'
 const seederDebug = debug('Spider:Seeder.ts')
@@ -78,10 +79,19 @@ export class Seeder {
     })
   }
 
-  public getTotalInsertItemCount(): number {
-    return this._tasks.reduce((accu, curr) => {
-      return accu + curr.insertItemCount
-    }, 0)
+  public getTaskStatistics(): TaskStatistics {
+    return {
+      siteCount: this.sites.length,
+      pageCount: this.tasks.length,
+      itemCount: this.tasks.reduce((accu, curr) => {
+        accu += curr.insertItemCount
+        return accu
+      }, 0),
+      retryCount: this.tasks.reduce((accu, curr) => {
+        accu += curr.retryCount
+        return accu
+      }, 0),
+    }
   }
 
   private toJSON() {

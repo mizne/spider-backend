@@ -1,9 +1,8 @@
-import { Spider } from '../Spider'
+import { Spider } from '../lib/Spider'
 import { BlogService } from '../lib/services/BlogService'
 import { Blog } from '../lib/models/Blog'
 import { BlogSite, BlogSelector } from '../lib/models/Site'
 import { Helper } from '../lib/Helper'
-import { SiteTask } from '../lib/tasks/SiteTask'
 
 export class BlogSpider extends Spider<Blog> {
   private blogService: BlogService

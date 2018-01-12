@@ -1,10 +1,10 @@
 import * as cheerio from 'cheerio'
 import * as debug from 'debug'
-import { Harvester } from './lib/harvesters/Harvester'
-import { Seeder } from './lib/seeders/Seeder'
-import { BlogSite, BlogSelector } from './lib/models/Site'
-import { SiteTask } from './lib/tasks/SiteTask'
-import { debugError } from './lib/Helper'
+import { Harvester } from './harvesters/Harvester'
+import { Seeder } from './seeders/Seeder'
+import { BlogSite, BlogSelector } from './models/Site'
+import { SpiderStatistics } from './models/Statistics'
+import { debugError } from './Helper'
 const debugSpider = debug('Spider:Spider.ts')
 
 export abstract class Spider<T> {
@@ -47,17 +47,26 @@ export abstract class Spider<T> {
     }
   }
 
-  public async run(concurrent: number = this.sites.length): Promise<any> {
-    return Promise.all(Array.from({length: concurrent}, () => this.singleRun()))
-    .then(() => {
-      const totalInsertItemCount = this.seeder.getTotalInsertItemCount()
-      this.doDestroy()
-      return totalInsertItemCount
-    })
-    .catch((err) => {
-      this.doDestroy()
-      return Promise.reject(err)
-    })
+  public async run(
+    concurrent: number = this.sites.length
+  ): Promise<SpiderStatistics> {
+    const startTime = Date.now()
+    return Promise.all(
+      Array.from({ length: concurrent }, () => this.singleRun())
+    )
+      .then(() => {
+        const endTime = Date.now()
+        const taskStatistics = this.seeder.getTaskStatistics()
+        this.doDestroy()
+        return {
+          ...taskStatistics,
+          secondCost: Math.floor((endTime - startTime) / 1e3)
+        }
+      })
+      .catch(err => {
+        this.doDestroy()
+        return Promise.reject(err)
+      })
   }
 
   private doDestroy(): void {

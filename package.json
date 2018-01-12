@@ -6,14 +6,18 @@
   "repository": {},
   "scripts": {
     "start": "ts-node src/index.ts",
-    "debug": "set DEBUG=Spider* && ts-node src/index.ts"
+    "debug": "set DEBUG=Spider* && ts-node src/index.ts",
+    "dev": "set DEBUG=Spider* && ts-node src/server.ts"
   },
   "dependencies": {
+    "@alicloud/sms-sdk": "^1.0.3",
     "assert": "^1.4.1",
     "axios": "^0.17.1",
     "chalk": "^2.3.0",
     "cheerio": "^1.0.0-rc.2",
     "debug": "^3.1.0",
+    "koa": "^2.4.1",
+    "koa-router": "^7.3.0",
     "leancloud-realtime": "^3.5.7",
     "leancloud-storage": "^3.4.2",
     "moment": "^2.20.1",
@@ -25,10 +29,13 @@
   "devDependencies": {
     "@types/cheerio": "^0.22.7",
     "@types/debug": "^0.0.30",
+    "@types/koa": "^2.0.43",
+    "@types/koa-router": "^7.0.27",
     "@types/node": "^8.5.2",
     "@types/ora": "^1.3.1",
     "@types/puppeteer": "^0.13.9",
     "@types/uuid": "^3.4.3",
+    "nodemon": "^1.14.11",
     "ts-node": "^4.1.0",
     "typescript": "^2.6.2"
   }

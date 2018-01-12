@@ -1,73 +1,21 @@
+import * as debug from 'debug'
 import { BlogSpider } from './custom/BlogSpider'
-import { BlogSite } from './lib/models/Site'
+import { sites } from './config/sites'
+import { SmsService } from './lib/services/SmsService'
 
-const sites: BlogSite[] = [
-  {
-    url: 'https://jeffjade.com',
-    selector: {
-      item: '#main article',
-      title: 'header h1 a',
-      url: 'header h1 a',
-      summary: '.article-content p',
-      source: '晚晴幽草轩',
-      releaseAt: 'time',
-      moreUrl: 'a.page-number'
-    }
-  },
-  {
-    url: 'http://taobaofed.org',
-    selector: {
-      item: '.article.article-summary',
-      title: '.article-title a',
-      url: '.article-title a',
-      summary: '.article-excerpt',
-      source: '淘宝前端团队',
-      releaseAt: 'time',
-      moreUrl: 'a.page-number'
-    }
-  },
-  {
-    url: 'https://www.h5jun.com/',
-    selector: {
-      item: '#page-index .post',
-      title: '.title a',
-      url: '.title a',
-      summary: '.entry-content p',
-      source: '十年踪迹',
-      releaseAt: '.date',
-      moreUrl: '.pagination a'
-    }
-  },
-  {
-    url: 'http://welefen.com/',
-    selector: {
-      item: '#page-index .post',
-      title: '.title a',
-      url: '.title a',
-      summary: '.entry-content p',
-      source: '李成银',
-      releaseAt: '.date',
-      moreUrl: '.pagination a'
-    }
-  },
-  {
-    url: 'http://www.css88.com/',
-    selector: {
-      item: 'article',
-      title: 'header h1 a',
-      url: 'header h1 a',
-      summary: '.entry-content p',
-      source: 'WEB前端开发CSS88',
-      releaseAt: 'time',
-      moreUrl: '.navigation a'
-    }
-  }
-]
+const debugIndex = debug('Spider:index.ts')
 
-new BlogSpider(sites).run()
-.then(count => {
-  console.log(`success insert item count: ${count};`)
-})
-.catch(e => {
-  console.log(`run error; e: ${e.message};`)
-})
+const main = async () => {
+  new BlogSpider(sites)
+    .run()
+    .then(statistics => {
+      debugIndex(`run success; statictics: `, statistics)
+      new SmsService().sendSuccessSms(statistics)
+    })
+    .catch(e => {
+      debugIndex(`run error; e: ${e.message};`)
+      new SmsService().sendFailureSms(e.message)
+    })
+}
+
+export { main }
