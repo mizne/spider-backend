@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "author": "mizne",
   "description": "spider",
-  "repository": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mizne/spider-backend.git"
+  },
+  "license": "MIT",
   "scripts": {
     "start": "ts-node src/index.ts",
     "debug": "set DEBUG=Spider* && ts-node src/index.ts",
