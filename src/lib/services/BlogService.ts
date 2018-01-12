@@ -1,8 +1,8 @@
 import { Blog } from '../models/Blog'
 import axios from 'axios'
-import { Logger } from '../../utils/Logger'
+import * as debug from 'debug'
+const serviceDebug = debug('Spider:BlogService.ts')
 
-// class NewsService extends BaseService {}
 var APP_ID = 'n2WB91RtFeJWLLDJA6KPdXSe-gzGzoHsz'
 var APP_KEY = 'oIIWpUWlszGyQ8lI2sJOIThe'
 var AV = require('leancloud-storage')
@@ -21,9 +21,7 @@ var http = axios.create({
 })
 
 export class BlogService {
-  private logger: Logger
   constructor() {
-    this.logger = new Logger(BlogService.name)
   }
   public async find(where: any): Promise<Blog[]> {
     const resp = await http.get('classes/Blog', {
@@ -56,7 +54,7 @@ export class BlogService {
     )
     if (needInsertItems.length > 0) {
       const resp = await this.batchSave(needInsertItems)
-      this.logger.success(
+      serviceDebug(
         `Batch insert success; count: ${needInsertItems.length};`
       )
       return resp

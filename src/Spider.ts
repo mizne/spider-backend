@@ -3,16 +3,16 @@ import { Harvester } from './lib/harvesters/Harvester'
 import { Seeder } from './lib/seeders/Seeder'
 import { BlogSite } from './lib/models/Site'
 import { SiteTask } from './lib/tasks/SiteTask'
-import { Logger } from './utils/Logger'
+import * as debug from 'debug'
+
+const debugSpider = debug('Spider:Spider.ts')
 
 export abstract class Spider<T> {
   private seeder: Seeder
   private harvester: Harvester
-  private logger: Logger
   constructor(private sites: BlogSite[]) {
     this.seeder = new Seeder(this.sites)
     this.harvester = new Harvester()
-    this.logger = new Logger(Spider.name)
   }
 
   public async run(): Promise<any> {
@@ -37,8 +37,9 @@ export abstract class Spider<T> {
           await sleep(1e2)
         }
       }
-    } catch(e) {
-      this.logger.error(`Run failure; err: ${e.message};`)
+      debugSpider(`Run success;`)
+    } catch (e) {
+      debugSpider(`Run failure; err: ${e.message};`)
     }
   }
 

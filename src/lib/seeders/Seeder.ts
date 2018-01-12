@@ -1,9 +1,10 @@
 import { Subject, Subscription } from 'rxjs'
 import * as assert from 'assert'
-import { Logger } from '../../utils/Logger'
 import { SiteTask } from '../tasks/SiteTask'
 import { BlogSite } from '../models/Site'
 
+import * as debug from 'debug'
+const seederDebug = debug('Spider:Seeder.ts')
 
 /**
  * 负责URL管理 TODO 优先级获取
@@ -13,10 +14,8 @@ import { BlogSite } from '../models/Site'
  */
 export class Seeder {
   private urlsTodo: { [key: string]: string[] } = {}
-
   private tasks: SiteTask[] = []
 
-  private logger: Logger
   private taskSuccessSub: Subject<SiteTask> = new Subject<SiteTask>()
   private taskFailureSub: Subject<SiteTask> = new Subject<SiteTask>()
   private taskAddMoreUrlsSub: Subject<{
@@ -27,7 +26,6 @@ export class Seeder {
   private subscriptions: Subscription[] = []
 
   constructor(private sites: BlogSite[]) {
-    this.initLogger()
     this.initUrls(sites)
     this.initSubscriber()
   }
@@ -43,7 +41,7 @@ export class Seeder {
     for (const domain of Object.keys(this.urlsTodo)) {
       if (this.urlsTodo[domain].length > 0) {
         const url = this.urlsTodo[domain].shift()
-        this.logger.info(`Get task success; domain: ${domain}; url: ${url};`)
+        seederDebug(`Get task success; domain: ${domain}; url: ${url};`)
         const task = new SiteTask({
           domain,
           url,
@@ -60,7 +58,7 @@ export class Seeder {
     for (const task of this.tasks) {
       if (task.needRetry()) {
         task.retry()
-        this.logger.info(
+        seederDebug(
           `Task retry; count: ${task.retryCount}; url: ${task.url};`
         )
         return task
@@ -75,7 +73,6 @@ export class Seeder {
   public destroy(): void {
     this.urlsTodo = null
     this.tasks.length = 0
-    this.logger = null
     this.subscriptions.forEach(e => {
       e.unsubscribe()
     })
@@ -90,10 +87,6 @@ export class Seeder {
 
   public inspect() {
     return this.toJSON()
-  }
-
-  private initLogger() {
-    this.logger = new Logger(Seeder.name)
   }
 
   private initUrls(sites: BlogSite[]) {
@@ -119,7 +112,7 @@ export class Seeder {
   }
 
   private success(task: SiteTask): void {
-    this.logger.success(
+    seederDebug(
       `Task success; domain: ${task.domain}; url: ${task.url}; retry count: ${
         task.retryCount
       }; success count: ${this.computeDoneCount()}`
@@ -128,7 +121,7 @@ export class Seeder {
 
   private failure(task: SiteTask): void {
     if (task.isFailure()) {
-      this.logger.error(
+      seederDebug(
         `Task failure; domain: ${task.domain}; url: ${task.url}; retry count: ${
           task.retryCount
         }`
@@ -136,7 +129,7 @@ export class Seeder {
     }
 
     if (task.needRetry()) {
-      this.logger.warn(
+      seederDebug(
         `Task need retry; domain: ${task.domain}; url: ${
           task.url
         }; retry count: ${task.retryCount}`
