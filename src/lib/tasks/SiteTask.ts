@@ -45,12 +45,12 @@ export class SiteTask {
     this._addMoreUrlsSub = options.addMoreUrlsSub
   }
 
-  success() {
+  public success() {
     this._status = SiteTaskStatus.SUCCESS
     this._successSub.next(this)
   }
 
-  failure() {
+  public failure() {
     if (this._retryCount >= MAX_RETRY_COUNT) {
       this._status = SiteTaskStatus.FAILURE
     } else {
@@ -59,39 +59,39 @@ export class SiteTask {
     this._failureSub.next(this)
   }
 
-  retry() {
+  public retry() {
     this._retryCount += 1
     this._status = SiteTaskStatus.PEDDING
   }
 
-  isCompleted(): boolean {
+  public isCompleted(): boolean {
     return this.isSuccess() || this.isFailure()
   }
 
-  isSuccess(): boolean {
+  public isSuccess(): boolean {
     return this._status === SiteTaskStatus.SUCCESS
   }
 
-  isFailure(): boolean {
+  public isFailure(): boolean {
     return this._status === SiteTaskStatus.FAILURE
   }
 
-  isPedding(): boolean {
+  public isPedding(): boolean {
     return this._status === SiteTaskStatus.PEDDING
   }
 
-  addMoreUrls(urls: string[]) {
+  public addMoreUrls(urls: string[]) {
     this._addMoreUrlsSub.next({
       task: this,
       urls
     })
   }
 
-  equals(anohter: SiteTask): boolean {
+  public equals(anohter: SiteTask): boolean {
     return this._id === anohter._id
   }
 
-  needRetry(): boolean {
+  public needRetry(): boolean {
     return this._status === SiteTaskStatus.TO_RETRY
   }
 

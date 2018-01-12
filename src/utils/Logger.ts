@@ -44,7 +44,7 @@ export class Logger {
   }
 
   public blank(lines = 2) {
-    console.log('\n\n')
+    console.log('\n'.repeat(lines))
   }
 
   private prefixFilePath(str: string):string {

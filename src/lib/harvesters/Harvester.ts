@@ -12,7 +12,7 @@ export class Harvester {
   private browser: Browser
   constructor() {
   }
-  async execute(task: SiteTask): Promise<any> {
+  public async execute(task: SiteTask): Promise<any> {
     try {
       task.html = await this.downloadHtml(task.url)
     } catch (err) {
@@ -20,7 +20,7 @@ export class Harvester {
     }
   }
 
-  async downloadHtml(url: string): Promise<string> {
+  public async downloadHtml(url: string): Promise<string> {
     if (!this.browser) {
       this.browser = await puppeteer.launch({ headless: true })
     }
@@ -35,7 +35,7 @@ export class Harvester {
     return bodyHTML
   }
 
-  async destroy() {
+  public async destroy() {
     if (this.browser) {
       this.browser.close()
     }

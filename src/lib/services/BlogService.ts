@@ -25,7 +25,7 @@ export class BlogService {
   constructor() {
     this.logger = new Logger(BlogService.name)
   }
-  async find(where: any): Promise<Blog[]> {
+  public async find(where: any): Promise<Blog[]> {
     const resp = await http.get('classes/Blog', {
       params: {
         where
@@ -34,7 +34,7 @@ export class BlogService {
     return resp.data.results
   }
 
-  async batchSave(items: Blog[]): Promise<any> {
+  public async batchSave(items: Blog[]): Promise<any> {
     const params = {
       requests: items.map(e => ({
         method: 'POST',
@@ -46,7 +46,7 @@ export class BlogService {
     return resp.data
   }
 
-  async batchInsertIfNotIn(items: Blog[]): Promise<any> {
+  public async batchInsertIfNotIn(items: Blog[]): Promise<any> {
     const urls = items.map(e => e.url)
     const existResults = await this.find({
       url: { $in: urls }

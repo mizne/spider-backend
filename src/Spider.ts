@@ -15,7 +15,7 @@ export abstract class Spider<T> {
     this.logger = new Logger(Spider.name)
   }
 
-  async run(): Promise<any> {
+  public async run(): Promise<any> {
     try {
       for (;;) {
         if (this.seeder.complete()) {
@@ -42,19 +42,19 @@ export abstract class Spider<T> {
     }
   }
 
-  destroy() {
+  public destroy() {
     this.seeder.destroy()
     this.seeder = null
     this.harvester.destroy()
     this.harvester = null
   }
 
-  abstract parse(
+  public abstract parse(
     $: CheerioStatic,
     task: SiteTask
   ): { items: T[]; urls: string[] }
 
-  abstract async save(items: T[]): Promise<any>
+  public abstract async save(items: T[]): Promise<any>
 }
 
 function sleep(ms: number) {

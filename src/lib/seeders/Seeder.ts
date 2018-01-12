@@ -1,8 +1,9 @@
+import { Subject, Subscription } from 'rxjs'
+import * as assert from 'assert'
 import { Logger } from '../../utils/Logger'
 import { SiteTask } from '../tasks/SiteTask'
 import { BlogSite } from '../models/Site'
 
-import { Subject, Subscription } from 'rxjs'
 
 /**
  * 负责URL管理 TODO 优先级获取
@@ -166,7 +167,7 @@ export class Seeder {
       .concat(...Object.values(this.urlsTodo))
       .concat(this.tasks.map(e => e.url))
     const allMustBeUnique = new Set(allUrls).size === allUrls.length
-    console.assert(
+    assert(
       allMustBeUnique,
       `Urls with todoUrl and tasks must be unique when add more urls;`
     )
@@ -174,6 +175,6 @@ export class Seeder {
 
   private assertTasksStatus() {
     const allNotNeddRetry = this.tasks.every(e => !e.needRetry())
-    console.assert(allNotNeddRetry, 'Tasks must be all not need retry!!!')
+    assert(allNotNeddRetry, 'Tasks must be all not need retry!!!')
   }
 }

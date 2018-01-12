@@ -12,7 +12,7 @@ export class BlogSpider extends Spider<Blog> {
     this.blogService = new BlogService()
   }
 
-  parse(
+  public parse(
     $: CheerioStatic,
     task: SiteTask
   ): {
@@ -56,7 +56,7 @@ export class BlogSpider extends Spider<Blog> {
     }
   }
 
-  async save(blogs: Blog[]) {
+  public async save(blogs: Blog[]) {
     return this.blogService.batchInsertIfNotIn(blogs)
   }
 }
