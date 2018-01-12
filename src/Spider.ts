@@ -1,10 +1,10 @@
 import * as cheerio from 'cheerio'
+import * as debug from 'debug'
 import { Harvester } from './lib/harvesters/Harvester'
 import { Seeder } from './lib/seeders/Seeder'
 import { BlogSite } from './lib/models/Site'
 import { SiteTask } from './lib/tasks/SiteTask'
-import * as debug from 'debug'
-
+import { debugError } from './lib/Helper'
 const debugSpider = debug('Spider:Spider.ts')
 
 export abstract class Spider<T> {
@@ -39,7 +39,7 @@ export abstract class Spider<T> {
       }
       debugSpider(`Run success;`)
     } catch (e) {
-      debugSpider(`Run failure; err: ${e.message};`)
+      debugError(e)
     }
   }
 

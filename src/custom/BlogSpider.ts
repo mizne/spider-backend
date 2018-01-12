@@ -2,7 +2,7 @@ import { Spider } from '../Spider'
 import { BlogService } from '../lib/services/BlogService'
 import { Blog } from '../lib/models/Blog'
 import { BlogSite } from '../lib/models/Site'
-import { resolveHref, resolveTimeFormat } from '../utils/index'
+import { Helper } from '../lib/Helper'
 import { SiteTask } from '../lib/tasks/SiteTask'
 
 export class BlogSpider extends Spider<Blog> {
@@ -22,7 +22,7 @@ export class BlogSpider extends Spider<Blog> {
     const { url, selector } = task
 
     const results = Array.from($(selector.item)).map(e => ({
-      url: resolveHref(
+      url: Helper.resolveHref(
         url,
         $(e)
           .find(selector.url)
@@ -38,7 +38,7 @@ export class BlogSpider extends Spider<Blog> {
         .text()
         .trim(),
       source: selector.source,
-      releaseAt: resolveTimeFormat(
+      releaseAt: Helper.resolveTimeFormat(
         $(e)
           .find(selector.releaseAt)
           .text()
@@ -47,7 +47,7 @@ export class BlogSpider extends Spider<Blog> {
     }))
 
     const moreUrls = Array.from($(selector.moreUrl)).map(e =>
-      resolveHref(url, $(e).attr('href'))
+      Helper.resolveHref(url, $(e).attr('href'))
     )
 
     return {

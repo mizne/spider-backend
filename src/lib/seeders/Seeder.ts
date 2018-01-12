@@ -162,12 +162,12 @@ export class Seeder {
     const allMustBeUnique = new Set(allUrls).size === allUrls.length
     assert(
       allMustBeUnique,
-      `Urls with todoUrl and tasks must be unique when add more urls;`
+      `Urls with todoUrl and tasks has duplication when add more urls!`
     )
   }
 
   private assertTasksStatus() {
     const allNotNeddRetry = this.tasks.every(e => !e.needRetry())
-    assert(allNotNeddRetry, 'Tasks must be all not need retry!!!')
+    assert(allNotNeddRetry, 'Tasks has someone to need retry!')
   }
 }
