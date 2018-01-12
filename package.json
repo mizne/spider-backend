@@ -9,9 +9,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "debug": "set DEBUG=Spider* && ts-node src/index.ts",
-    "dev": "set DEBUG=Spider* && ts-node src/server.ts"
+    "start": "set DEBUG=Spider* && ts-node src/server.ts",
+    "debug": "set DEBUG=Spider* && ts-node src/index.ts"
   },
   "dependencies": {
     "@alicloud/sms-sdk": "^1.0.3",

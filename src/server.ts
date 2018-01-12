@@ -7,6 +7,10 @@ import { debugError } from './lib/Helper'
 const app = new koa()
 const router = new Router()
 
+const PORT = parseInt(
+  process.env.LEANCLOUD_APP_PORT || process.env.PORT || '3000'
+)
+
 app.use(async (_, next) => {
   try {
     await next()
@@ -21,6 +25,6 @@ router.get('/*', async ctx => {
 })
 
 app.use(router.routes())
-app.listen(3000, () => {
-  console.log(`Server listening on port 3000!!!`)
+app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}!!!`)
 })
