@@ -1,14 +1,17 @@
 import { Spider } from '../lib/Spider'
 import { BlogService } from '../lib/services/BlogService'
+import { SourceService } from '../lib/services/SourceService'
 import { Blog } from '../lib/models/Blog'
 import { BlogSite, BlogSelector } from '../lib/models/Site'
 import { Helper } from '../lib/Helper'
 
 export class BlogSpider extends Spider<Blog> {
   private blogService: BlogService
+  private sourceService: SourceService
   constructor(sites: BlogSite[]) {
     super(sites)
     this.blogService = new BlogService()
+    this.sourceService = new SourceService()
   }
 
   public parse(
@@ -16,10 +19,9 @@ export class BlogSpider extends Spider<Blog> {
     url: string,
     selector: BlogSelector
   ): {
-    items: Blog[],
+    items: Blog[]
     urls: string[]
   } {
-
     const results = Array.from($(selector.item)).map(e => ({
       url: Helper.resolveHref(
         url,
@@ -56,6 +58,10 @@ export class BlogSpider extends Spider<Blog> {
   }
 
   public async save(blogs: Blog[]): Promise<number> {
-    return this.blogService.batchInsertIfNotIn(blogs)
+    if (blogs.length > 0) {
+      await this.sourceService.insertIfNotIn(blogs[0].source)
+      return this.blogService.batchInsertIfNotIn(blogs)
+    }
+    return Promise.resolve(0)
   }
 }

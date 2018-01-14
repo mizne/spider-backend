@@ -5,7 +5,7 @@ import { LEAN_API } from '../../../config/api'
 
 const serviceDebug = debug('Spider:BlogService.ts')
 const http = axios.create({
-  baseURL: 'https://wkwmwlkk.api.lncld.net/1.1/',
+  baseURL: `https://${LEAN_API.APP_ID.slice(0, 8)}.api.lncld.net/1.1/`,
   headers: {
     'X-LC-Id': LEAN_API.APP_ID,
     'X-LC-Key': LEAN_API.APP_KEY
