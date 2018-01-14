@@ -12,14 +12,14 @@ class Helper {
       return ''
     }
     if (Helper.isURL(href)) {
-      return href
+      return Helper.removeLastSlash(href)
     }
 
     const [protocal, , host] = url.split('/')
     const hrefTotal = `${protocal}//${host}${
       href.indexOf('/') === 0 ? '' : '/'
     }${href}`
-    return hrefTotal.slice(-1) === '/' ? hrefTotal.slice(0, -1) : hrefTotal
+    return Helper.removeLastSlash(hrefTotal)
   }
 
   public static fullPath(host: string, path: string): string {
@@ -48,6 +48,10 @@ class Helper {
     }
 
     throw new Error(`date time format not support; str: ${str}`)
+  }
+
+  private static removeLastSlash(url: string): string {
+    return url.slice(-1) === '/' ? url.slice(0, -1) : url
   }
 
   private static isURL(str: string): boolean {
