@@ -8,7 +8,7 @@ import * as debug from 'debug'
 const seederDebug = debug('Spider:Seeder.ts')
 
 /**
- * 负责URL管理 TODO 优先级获取
+ * 负责URL管理 及 Task管理
  *
  * @export
  * @class Seeder
