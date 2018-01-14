@@ -1,15 +1,16 @@
 import * as koa from 'koa'
 import * as Router from 'koa-router'
-
-import { main } from './index'
+import * as debug from 'debug'
 import { debugError } from './lib/Helper'
+import { spider } from './schedules/spider/spider'
+import { signIn } from './schedules/sign-in/signIn'
+import './schedules'
 
 const app = new koa()
 const router = new Router()
+const debugServer = debug('Spider:Server')
 
-const PORT = parseInt(
-  process.env.LEANCLOUD_APP_PORT || process.env.PORT || '3000'
-)
+const PORT = 3000
 
 app.use(async (_, next) => {
   try {
@@ -19,12 +20,17 @@ app.use(async (_, next) => {
   }
 })
 
-router.get('/*', async ctx => {
-  // main()
+router.get('/sign-in', async ctx => {
+  signIn()
+  ctx.body = 'SignIn beginning...'
+})
+
+router.get('/spider', async ctx => {
+  spider()
   ctx.body = 'Spider beginning...'
 })
 
 app.use(router.routes())
 app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}!!!`)
+  debugServer(`Server listening on port ${PORT}!!!`)
 })

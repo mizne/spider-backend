@@ -12,13 +12,12 @@ const debugHarvester = debug('Spider:Harvester')
  */
 export class Harvester {
   private browser: Browser
-  constructor() {
-  }
+  constructor() {}
   public async execute(url: string): Promise<string> {
     try {
       return await this.downloadHtml(url)
     } catch (err) {
-      debugHarvester(`Download html failure; url: ${url}; err: ${err.message};`)
+      console.log(`Download html failure; url: ${url}; err: ${err.message};`)
       return ''
     }
   }
@@ -26,7 +25,9 @@ export class Harvester {
   public async downloadHtml(url: string): Promise<string> {
     debugHarvester(`Download html beginning; url: ${url};`)
     if (!this.browser) {
-      this.browser = await puppeteer.launch({ headless: true })
+      this.browser = await puppeteer.launch({
+        headless: true,
+      })
     }
     const page = await this.browser.newPage()
     await page.goto(url)

@@ -1,23 +1,14 @@
 import axios from 'axios'
 import * as debug from 'debug'
-import { debugError } from '../Helper'
 import { Blog } from '../models/Blog'
+import { LEAN_API } from '../../../config/api'
+
 const serviceDebug = debug('Spider:BlogService.ts')
-
-var APP_ID = 'n2WB91RtFeJWLLDJA6KPdXSe-gzGzoHsz'
-var APP_KEY = 'oIIWpUWlszGyQ8lI2sJOIThe'
-var AV = require('leancloud-storage')
-
-AV.init({
-  appId: APP_ID,
-  appKey: APP_KEY
-})
-
-var http = axios.create({
-  baseURL: 'https://n2wb91rt.api.lncld.net/1.1/',
+const http = axios.create({
+  baseURL: 'https://wkwmwlkk.api.lncld.net/1.1/',
   headers: {
-    'X-LC-Id': APP_ID,
-    'X-LC-Key': APP_KEY
+    'X-LC-Id': LEAN_API.APP_ID,
+    'X-LC-Key': LEAN_API.APP_KEY
   }
 })
 
@@ -47,13 +38,16 @@ export class BlogService {
   public async batchInsertIfNotIn(items: Blog[]): Promise<number> {
     try {
       const urls = items.map(e => e.url)
-      const existResults = await this.find({
-        url: { $in: urls }
-      })
-      .catch((e) => {
+      let existResults: any[]
+      try {
+        existResults = await this.find({
+          url: { $in: urls }
+        })
+      } catch(e) {
         serviceDebug(`Batch find item failure; err: ${e.message};`)
-        return [] as Blog[]
-      })
+        return 0
+      }
+      
       const needInsertItems = items.filter(
         item => !existResults.find(exist => exist.url === item.url)
       )
@@ -63,7 +57,7 @@ export class BlogService {
         return needInsertItems.length
       }
     } catch (e) {
-      serviceDebug(`Batch insert failure; err: ${e};`)
+      serviceDebug(`Batch insert failure; err: ${e.message};`)
     }
     return 0
   }
