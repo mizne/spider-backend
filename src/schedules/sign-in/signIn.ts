@@ -7,13 +7,17 @@ const signIn = async () => {
   for (const user of users) {
     const result = await new Main(user.name, user.password).run()
     if (result.status) {
-      smsService.signInSuccess(
+      await smsService.signInSuccess(
         user.name,
         result.lastPoints,
         result.currentPoints
       )
     } else {
-      smsService.signInFailure(user.name, result.lastPoints, result.lastPoints)
+      await smsService.signInFailure(
+        user.name,
+        result.lastPoints,
+        result.lastPoints
+      )
     }
   }
 }

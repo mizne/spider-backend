@@ -16,10 +16,10 @@ export class SmsService {
         TemplateCode: 'SMS_121910678',
         TemplateParam: JSON.stringify(statistics)
       })
+      debugSms(`Spider success; code: ${resp.Code}; message: ${resp.Message};`)
       if (resp.Code === 'OK') {
         return resp
       } else {
-        debugSms(`Send sms failure; code: ${resp.Code};`)
         return Promise.reject(
           new Error(`Send sms failure; code: ${resp.Code};`)
         )
@@ -37,10 +37,10 @@ export class SmsService {
         TemplateCode: 'SMS_121850656',
         TemplateParam: JSON.stringify({ errorMsg: msg })
       })
+      debugSms(`Spider failure; code: ${resp.Code}; message: ${resp.Message};`)
       if (resp.Code === 'OK') {
         return resp
       } else {
-        debugSms(`Send sms failure; code: ${resp.Code};`)
         return Promise.reject(
           new Error(`Send sms failure; code: ${resp.Code};`)
         )
@@ -62,11 +62,10 @@ export class SmsService {
         TemplateCode: 'SMS_121906231',
         TemplateParam: JSON.stringify({ name, lastPoints, currentPoints })
       })
-      console.log(resp)
+      debugSms(`Sign in success; code: ${resp.Code}; message: ${resp.Message};`)
       if (resp.Code === 'OK') {
         return resp
       } else {
-        debugSms(`Send sms failure; code: ${resp.Code};`)
         return Promise.reject(
           new Error(`Send sms failure; code: ${resp.Code};`)
         )
@@ -88,11 +87,10 @@ export class SmsService {
         TemplateCode: 'SMS_121856266',
         TemplateParam: JSON.stringify({ name, lastPoints, currentPoints })
       })
-      console.log(resp)
+      debugSms(`Sign in failure; code: ${resp.Code}; message: ${resp.Message};`)
       if (resp.Code === 'OK') {
         return resp
       } else {
-        debugSms(`Send sms failure; code: ${resp.Code};`)
         return Promise.reject(
           new Error(`Send sms failure; code: ${resp.Code};`)
         )

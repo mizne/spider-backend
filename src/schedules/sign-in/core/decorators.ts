@@ -14,7 +14,7 @@ export function log(options: LogOptions = {}) {
   ) {
     const originalFn = descriptor.value as Function
     const className = target.constructor.name
-    const debugLog = debug(className)
+    const debugLog = debug(`Spider:${className}`)
 
     const beginDesc =
       options.beginDesc || `${propertyKey} method begining...`

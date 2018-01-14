@@ -17,7 +17,7 @@ export class Harvester {
     try {
       return await this.downloadHtml(url)
     } catch (err) {
-      console.log(`Download html failure; url: ${url}; err: ${err.message};`)
+      debugHarvester(`Download html failure; url: ${url}; err: ${err.message};`)
       return ''
     }
   }

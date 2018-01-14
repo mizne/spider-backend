@@ -1,6 +1,8 @@
 import { Page, Browser, launch } from 'puppeteer'
 import * as uuid from 'uuid'
+import * as debug from 'debug'
 import { log } from './decorators'
+const debugMain = debug('Spider:Main')
 
 const pageConfig = {
   pageUrl: 'http://hkpic.net',
@@ -44,6 +46,8 @@ export default class Main {
         this.status = true
         this.currentPoints = await this.checkPoint()
       }
+    } catch(e) {
+      debugMain(`Run error; err:${e.message};`)
     } finally {
       await this.tearDown()
     }
@@ -58,7 +62,7 @@ export default class Main {
   @log()
   private async setUp() {
     this.browser = await launch({
-      headless: true,
+      headless: true
     })
     this.page = await this.browser.newPage()
 
